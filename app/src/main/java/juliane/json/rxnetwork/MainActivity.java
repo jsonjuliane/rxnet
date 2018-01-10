@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import juliane.json.rxnet.RxNet;
+import juliane.json.rxnet.receiver.ConnectionReceiver;
 
 public class MainActivity extends AppCompatActivity{
 

@@ -74,8 +74,8 @@ public class NetworkModule {
                 .addInterceptor(httpLoggingInterceptor)
                 .addInterceptor(headerInterceptor)
                 .cache(cache)
-                .connectTimeout(500, TimeUnit.MILLISECONDS)
-                .readTimeout(500, TimeUnit.MILLISECONDS)
+                .connectTimeout(1000, TimeUnit.MILLISECONDS)
+                .readTimeout(1000, TimeUnit.MILLISECONDS)
                 .build();
 
     }

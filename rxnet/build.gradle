@@ -1,5 +1,29 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'Networking'
+    bintrayName = 'rxnet'
+
+    publishedGroupId = 'juliane.json'
+    libraryName = 'rxnet'
+    artifact = 'rxnet'
+
+    libraryDescription = 'Reactive limited access network validation library.'
+
+    siteUrl = 'https://github.com/jsonjuliane/rxnet'
+    gitUrl = 'https://github.com/jsonjuliane/rxnet.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'jsonjuliane'
+    developerName = 'Json Json'
+    developerEmail = 'jsonjuliane@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion 26
 
@@ -49,3 +73,6 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
 }
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

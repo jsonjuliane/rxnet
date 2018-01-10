@@ -18,6 +18,16 @@ __Special Thanks: Code is heavily influenced by this guy: https://stackoverflow.
 Download
 --------
 
+Add this to your project level build.gradle
+```groovy
+repositories {
+    maven {
+        url  "https://dl.bintray.com/jsonjuliane/Networking"
+          }
+    }
+```
+
+Add this to your app level build.gradle
 ```groovy
 dependencies {
   compile 'juliane.json:rxnet:1.0.0'

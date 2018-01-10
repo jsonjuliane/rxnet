@@ -1,7 +1,6 @@
 package juliane.json.rxnet;
 
 import android.content.Context;
-import android.util.Log;
 
 import juliane.json.rxnet.component.AppComponent;
 import juliane.json.rxnet.component.DaggerAppComponent;
@@ -19,10 +18,7 @@ import retrofit2.Response;
 public class RxNet {
 
     ApiService apiService;
-    Boolean result;
-
     AppComponent appComponent;
-
     Context context;
 
     public RxNet(Context context) {
@@ -41,24 +37,32 @@ public class RxNet {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                        limitedAccessCallback.onReturn(response.code() == 204);
+                        Boolean contentLengthEmpty;
 
+                        try{
+                            response.body().contentLength();
+                            contentLengthEmpty = false;
+                        }catch (NullPointerException err){
+                            contentLengthEmpty = true;
+                        }
+
+                        limitedAccessCallback.onResponse(response.code() == 204 && contentLengthEmpty == true);
 
                     }
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                        limitedAccessCallback.onReturn(false);
+                        limitedAccessCallback.onResponse(false);
 
                     }
                 });
 
     }
 
-    public interface LimitedAccessCallback{
+    public interface LimitedAccessCallback {
 
-        void onReturn(Boolean isConnected);
+        void onResponse(Boolean isConnected);
 
     }
 

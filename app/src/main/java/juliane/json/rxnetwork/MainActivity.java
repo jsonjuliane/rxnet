@@ -9,7 +9,9 @@ import com.google.gson.Gson;
 
 import juliane.json.rxnet.RxNet;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
+
+    private boolean allow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         RxNet rxNet = new RxNet(this);
         rxNet.checkLimitedAccess(new RxNet.LimitedAccessCallback() {
             @Override
-            public void onReturn(Boolean isConnected) {
+            public void onResponse(Boolean isConnected) {
 
                 Toast.makeText(getApplicationContext(), String.valueOf(isConnected), Toast.LENGTH_SHORT).show();
 
@@ -27,4 +29,5 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 }

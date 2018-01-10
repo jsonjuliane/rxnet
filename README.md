@@ -6,6 +6,28 @@ Reactive limited access network validation using time-bound http request.
 
 __Special Thanks: Code is heavily influenced by this guy: https://stackoverflow.com/users/741249/thelper__
 
+-----
+
+__Initialization, Context and Boolean (true = connected, false = not connected -> Toast a 'No Connection' warning)__
+
+```java
+
+public RxNet(Context context, Boolean subscribe) {
+    this.context = context;
+    appComponent = DaggerAppComponent.builder()
+            .contextModule(new ContextModule(context))
+            .build();
+
+    apiService = appComponent.getApiService();
+
+    subscribeConnection(subscribe);
+
+}
+
+```
+
+__For manually checking connection__
+
 ```java
  RxNet rxNet = new RxNet(this);
         rxNet.checkLimitedAccess(new RxNet.LimitedAccessCallback() {
@@ -15,19 +37,53 @@ __Special Thanks: Code is heavily influenced by this guy: https://stackoverflow.
             }
         });
 ```
+
+__Subscribes to Connection Changes ->  You have to implement the SubscriptionCallback class to handle return__
+
+```java
+
+public void subscribeConnection(final SubscriptionCallback subscriptionCallback) {
+    ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+        connectivityManager.registerNetworkCallback(
+                builder.build(),
+                new ConnectivityManager.NetworkCallback() {
+                    @Override
+                    public void onAvailable(Network network) {
+
+                        checkLimitedAccess(new LimitedAccessCallback() {
+                            @Override
+                            public void onResponse(Boolean isConnected) {
+
+                                subscriptionCallback.onSubscribe(isConnected);
+
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onLost(Network network) {
+
+                        subscriptionCallback.onSubscribe(false);
+
+                    }
+                }
+
+        );
+
+    }
+}
+
+```
+
+
 Download
 --------
 
-Add this to your project level build.gradle
-```groovy
-repositories {
-    maven {
-        url  "https://dl.bintray.com/jsonjuliane/Networking"
-          }
-    }
-```
-
-Add this to your app level build.gradle
+Add this to your build.gradle : app level
 ```groovy
 dependencies {
   compile 'juliane.json:rxnet:1.0.0'

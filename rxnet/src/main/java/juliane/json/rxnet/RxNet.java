@@ -6,14 +6,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import juliane.json.rxnet.callback.LimitedAccessCallback;
+import juliane.json.rxnet.callback.SubscriptionCallback;
 import juliane.json.rxnet.component.AppComponent;
 import juliane.json.rxnet.component.DaggerAppComponent;
 import juliane.json.rxnet.module.ContextModule;
-import juliane.json.rxnet.receiver.ConnectionReceiver;
 import juliane.json.rxnet.service.ApiService;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -24,19 +28,21 @@ import retrofit2.Response;
  * Created by jsonjuliane on 10/01/2018.
  */
 
-public class RxNet{
+public class RxNet {
 
     ApiService apiService;
     AppComponent appComponent;
     Context context;
 
-    public RxNet(Context context) {
+    public RxNet(Context context, Boolean subscribe) {
         this.context = context;
         appComponent = DaggerAppComponent.builder()
                 .contextModule(new ContextModule(context))
                 .build();
 
         apiService = appComponent.getApiService();
+
+        subscribeConnection(subscribe);
 
     }
 
@@ -98,10 +104,72 @@ public class RxNet{
 
     }
 
-    public interface LimitedAccessCallback {
+    private void subscribeConnection(Boolean subscribe) {
 
-        void onResponse(Boolean isConnected);
+        if(subscribe) {
 
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+                NetworkRequest.Builder builder = new NetworkRequest.Builder();
+                connectivityManager.registerNetworkCallback(
+                        builder.build(),
+                        new ConnectivityManager.NetworkCallback() {
+                            @Override
+                            public void onAvailable(Network network) {
+
+
+                            }
+
+                            @Override
+                            public void onLost(Network network) {
+
+                                Toast.makeText(context, "No connection.", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+
+                );
+
+            }
+        }
+
+
+    }
+
+    public void subscribeConnection(final SubscriptionCallback subscriptionCallback) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            NetworkRequest.Builder builder = new NetworkRequest.Builder();
+            connectivityManager.registerNetworkCallback(
+                    builder.build(),
+                    new ConnectivityManager.NetworkCallback() {
+                        @Override
+                        public void onAvailable(Network network) {
+
+                            checkLimitedAccess(new LimitedAccessCallback() {
+                                @Override
+                                public void onResponse(Boolean isConnected) {
+
+                                    subscriptionCallback.onSubscribe(isConnected);
+
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onLost(Network network) {
+
+                            subscriptionCallback.onSubscribe(false);
+
+                        }
+                    }
+
+            );
+
+        }
     }
 
 }
